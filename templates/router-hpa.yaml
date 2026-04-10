@@ -1,0 +1,24 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: vllm-router-hpa
+  namespace: confighubplaceholder
+  labels:
+    app.kubernetes.io/name: router
+    app.kubernetes.io/instance: vllm
+    app.kubernetes.io/component: router
+    app.kubernetes.io/part-of: vllm-stack
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: vllm-deployment-router
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80

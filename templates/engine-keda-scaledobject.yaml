@@ -1,0 +1,27 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: vllm-MODELNAME-scaledobject
+  namespace: confighubplaceholder
+  labels:
+    model: MODELNAME
+    app.kubernetes.io/name: serving-engine
+    app.kubernetes.io/instance: vllm
+    app.kubernetes.io/component: serving-engine
+    app.kubernetes.io/part-of: vllm-stack
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: vllm-MODELNAME-deployment-vllm
+  minReplicaCount: 1
+  maxReplicaCount: 5
+  pollingInterval: 15
+  cooldownPeriod: 360
+  triggers:
+    - type: prometheus
+      metadata:
+        serverAddress: http://prometheus-operated.monitoring.svc:9090
+        metricName: vllm:num_requests_waiting
+        query: vllm:num_requests_waiting{model="MODELNAME"}
+        threshold: "5"

@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: vllm-engine-servicemonitor
+  namespace: confighubplaceholder
+  labels:
+    app.kubernetes.io/name: serving-engine
+    app.kubernetes.io/instance: vllm
+    app.kubernetes.io/component: serving-engine
+    app.kubernetes.io/part-of: vllm-stack
+spec:
+  endpoints:
+    - port: http
+      honorLabels: false
+      interval: 30s
+      scrapeTimeout: 25s
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: vllm
+      app.kubernetes.io/component: serving-engine
+      app.kubernetes.io/part-of: vllm-stack

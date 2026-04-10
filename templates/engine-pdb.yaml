@@ -1,0 +1,14 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: vllm-MODELNAME-pdb-vllm
+  namespace: confighubplaceholder
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      model: MODELNAME
+      app.kubernetes.io/name: serving-engine
+      app.kubernetes.io/instance: vllm
+      app.kubernetes.io/component: serving-engine
+      app.kubernetes.io/part-of: vllm-stack

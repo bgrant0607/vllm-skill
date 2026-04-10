@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vllm-deployment-cache-server
+  namespace: confighubplaceholder
+  labels:
+    app.kubernetes.io/name: cache-server
+    app.kubernetes.io/instance: vllm
+    app.kubernetes.io/component: cache-server
+    app.kubernetes.io/part-of: vllm-stack
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cache-server
+      app.kubernetes.io/instance: vllm
+      app.kubernetes.io/component: cache-server
+      app.kubernetes.io/part-of: vllm-stack
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cache-server
+        app.kubernetes.io/instance: vllm
+        app.kubernetes.io/component: cache-server
+        app.kubernetes.io/part-of: vllm-stack
+    spec:
+      containers:
+        - name: lmcache-server
+          image: lmcache/vllm-openai:latest
+          command:
+            - "/opt/venv/bin/lmcache_server"
+            - "0.0.0.0"
+            - "8000"
+          ports:
+            - name: caserver-cport
+              containerPort: 8000
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: "4"
+              memory: 8Gi
+            limits:
+              cpu: "4"
+              memory: 10Gi

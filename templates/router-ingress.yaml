@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vllm-ingress-router
+  namespace: confighubplaceholder
+  labels:
+    app.kubernetes.io/name: router
+    app.kubernetes.io/instance: vllm
+    app.kubernetes.io/component: router
+    app.kubernetes.io/part-of: vllm-stack
+spec:
+  rules:
+    - host: vllm-router.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: vllm-router-service
+                port:
+                  number: 80

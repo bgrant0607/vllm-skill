@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vllm-MODELNAME-deployment-vllm
+  namespace: confighubplaceholder
+  labels:
+    model: MODELNAME
+    app.kubernetes.io/name: serving-engine
+    app.kubernetes.io/instance: vllm
+    app.kubernetes.io/component: serving-engine
+    app.kubernetes.io/part-of: vllm-stack
+    environment: production
+spec:
+  replicas: 1
+  progressDeadlineSeconds: 1200
+  selector:
+    matchLabels:
+      model: MODELNAME
+      app.kubernetes.io/name: serving-engine
+      app.kubernetes.io/instance: vllm
+      app.kubernetes.io/component: serving-engine
+      app.kubernetes.io/part-of: vllm-stack
+      environment: production
+  template:
+    metadata:
+      labels:
+        model: MODELNAME
+        app.kubernetes.io/name: serving-engine
+        app.kubernetes.io/instance: vllm
+        app.kubernetes.io/component: serving-engine
+        app.kubernetes.io/part-of: vllm-stack
+        environment: production
+    spec:
+      runtimeClassName: nvidia
+      hostname: vllm-MODELNAME-vllm-stack
+      subdomain: vllm-MODELNAME-engine-service
+      containers:
+        - name: vllm
+          image: vllm/vllm-openai:latest
+          command:
+            - "vllm"
+            - "serve"
+            - "MODELURL"
+            - "--host=0.0.0.0"
+            - "--port=8000"
+          imagePullPolicy: Always
+          env:
+            - name: PYTHONHASHSEED
+              value: "123"
+            - name: HF_HOME
+              value: /tmp
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: PROMETHEUS_MULTIPROC_DIR
+              value: /tmp
+          ports:
+            - name: http
+              containerPort: 8000
+            - name: zmq-port
+              containerPort: 55555
+            - name: ucx-port
+              containerPort: 9999
+          startupProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 60
+            httpGet:
+              path: /health
+              port: 8000
+          livenessProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+          readinessProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8000
+          resources:
+            requests:
+              cpu: "6"
+              memory: 16Gi
+              nvidia.com/gpu: "1"
+            limits:
+              nvidia.com/gpu: "1"
+          securityContext:
+            runAsNonRoot: false

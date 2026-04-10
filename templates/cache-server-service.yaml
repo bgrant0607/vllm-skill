@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vllm-cache-server-service
+  namespace: confighubplaceholder
+  labels:
+    app.kubernetes.io/name: cache-server
+    app.kubernetes.io/instance: vllm
+    app.kubernetes.io/component: cache-server
+    app.kubernetes.io/part-of: vllm-stack
+spec:
+  type: ClusterIP
+  ports:
+    - name: cacheserver-sport
+      port: 80
+      targetPort: 8000
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: cache-server
+    app.kubernetes.io/instance: vllm
+    app.kubernetes.io/component: cache-server
+    app.kubernetes.io/part-of: vllm-stack

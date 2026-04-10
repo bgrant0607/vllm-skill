@@ -1,0 +1,13 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: vllm-pdb-router
+  namespace: confighubplaceholder
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: router
+      app.kubernetes.io/instance: vllm
+      app.kubernetes.io/component: router
+      app.kubernetes.io/part-of: vllm-stack
