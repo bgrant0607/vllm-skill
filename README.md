@@ -1,2 +1,2 @@
 # vllm-skill
-Claude skill to install vllm
+Agent skill to install vllm
